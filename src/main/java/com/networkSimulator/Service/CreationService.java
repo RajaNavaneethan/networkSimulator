@@ -14,7 +14,7 @@ import com.networkSimulator.DTO.ResponseDTO;
 @Service
 public class CreationService {
 	
-	NetworkStore netstore = NetworkStore.getInstance();
+	static NetworkStore netstore = NetworkStore.getInstance();
 	
 	enum TYPE{
 		connect,
@@ -31,7 +31,6 @@ public class CreationService {
 		TYPE check = checkCreateCommand(commandText);
 		if(check==TYPE.neither)
 		{
-			System.out.println("Invalid");
 			resp.setMesg("Invalid Command");
 		}
 		else if(check==TYPE.create) 
@@ -45,9 +44,11 @@ public class CreationService {
 			{
 				int index = netstore.getIndexMapper().size();
 				Map<String,Integer> temp = netstore.getIndexMapper();
-				Map<String,String> temp1 = netstore.getDeviceTypeMapper();
+				Map<Integer,String> temp1 = netstore.getDeviceTypeMapper();
+				Map<Integer,Integer> temp2 = netstore.getStrength();
 				temp.put(respMesg.getString("name"), index);
-				temp1.put(respMesg.getString("name"), respMesg.getString("type"));
+				temp1.put(index, respMesg.getString("type"));
+				temp2.put(index,5);
 				netstore.setIndexMapper(temp);
 				netstore.setDeviceTypeMapper(temp1);
 				netstore.add();
@@ -56,16 +57,13 @@ public class CreationService {
 		}
 		else
 		{
-			System.out.println("Invalid cgheck" + respMesg.get("targets"));
 			JSONArray jar = new JSONArray(respMesg.get("targets").toString());
 			String source = respMesg.getString("source");
-			System.out.println("Invalid cgheck"  + source);
 			if(!netstore.getIndexMapper().containsKey(source))
 			{
 				resp.setMesg("Node '"+source+"' not found");
 				return resp;
 			}
-			System.out.println("Invalid cgheck");
 
 			Vector<Vector<Integer>> vec = netstore.getVec();
 			int sourceIndex =netstore.getIndexMapper().get(source);
@@ -83,6 +81,7 @@ public class CreationService {
 				}
 				int targetIndex =netstore.getIndexMapper().get(jar.get(i));
 				Vector<Integer> val = vec.get(sourceIndex);
+				Vector<Integer> val1 = vec.get(targetIndex);
 				if(val.get(targetIndex) != 0)
 				{
 					resp.setMesg("Devices are already connected");
@@ -91,11 +90,11 @@ public class CreationService {
 				else
 				{
 					val.set(targetIndex,5);
+					val1.set(sourceIndex,5);
 				}
 				vec.set(sourceIndex, val);
+				vec.set(targetIndex, val1);
 				netstore.setVec(vec);
-				System.out.println("Invalid cgheck");
-
 			}
 		}
 		return resp;
@@ -139,7 +138,6 @@ public class CreationService {
 	
 	public TYPE checkType(JSONObject input )
 	{
-		System.out.println("Inside ccheckType");
 		boolean isCreate = false;
 		if(input.has("type")  && input.has("name"))
 			isCreate = true;
@@ -173,15 +171,24 @@ public class CreationService {
 		String command2 = "CREATE /connections\r\n"
 				+ "content-type : application/json\r\n"
 				+ "{\"source\" : \"A1\", \"targets\" : [\"A2\",\"A3\"]}";
+		String command5 = "CREATE /connections\r\n"
+				+ "content-type : application/json\r\n"
+				+ "{\"source\" : \"A3\", \"targets\" : [\"A4\"]}";
 		String command4 = "CREATE /devices\r\n"
 				+ "content-type : application/json\r\n"
 				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A4\"}";
+		String command6 = "CREATE /devices\r\n"
+				+ "content-type : application/json\r\n"
+				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A5\"}";
 		CreationService s = new CreationService();
 		s.executeCreate(command).getMesg();
 		s.executeCreate(command1).getMesg();
 		s.executeCreate(command3).getMesg();
 		s.executeCreate(command2).getMesg();
 		s.executeCreate(command4).getMesg();
+		s.executeCreate(command5).getMesg();
+		s.executeCreate(command6).getMesg();
+		netstore.calculateRoute("A2","A4");
 	}
 	
 }

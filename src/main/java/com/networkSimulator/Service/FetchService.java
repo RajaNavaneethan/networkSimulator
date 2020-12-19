@@ -2,10 +2,8 @@ package com.networkSimulator.Service;
 
 import java.util.Iterator;
 import java.util.Map;
-
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
 import com.networkSimulator.Cache.NetworkStore;
 import com.networkSimulator.DTO.ResponseDTO;
 
