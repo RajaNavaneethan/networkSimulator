@@ -20,7 +20,6 @@ public class FetchService {
 		TYPE check = checkFetchCommand(commandText);
 		if(check==TYPE.neither)
 		{
-			System.out.println("Invalid");
 			resp.setMesg("Invalid Command");
 		}
 		else if(check==TYPE.devices)

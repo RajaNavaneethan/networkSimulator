@@ -8,27 +8,29 @@ import com.networkSimulator.DTO.ResponseDTO;
 @Service
 public class MainService {
 	
-//	@Autowired
-	CreationService create = new CreationService();
+	@Autowired
+	CreationService create ;
 	
-//	@Autowired
-	FetchService fetch = new FetchService();
+	@Autowired
+	FetchService fetch ;
 	
-//	@Autowired
-	ModifyService modify= new ModifyService();
+	@Autowired
+	ModifyService modify;
 	
 	public ResponseDTO separator(String commandText) {
 		ResponseDTO resp ;
 		try {
-		String[] splited = commandText.split("\\s+");
-		String type = splited[0];
-		switch(type) {
-		case "CREATE": System.out.println("inside Create");return create.executeCreate(commandText);
-		case "MODIFY": System.out.println("inside Modify");return fetch.executeFetch(commandText);
-		case "FETCH": System.out.println("inside Fetch");return fetch.executeFetch(commandText);
-		default: System.out.println("inside Default");break;
-		}
-		return new ResponseDTO();
+			String[] splited = commandText.split("\\s+");
+			String type = splited[0];
+			switch(type) {
+			case "CREATE": System.out.println("inside Create");return create.executeCreate(commandText);
+			case "MODIFY": System.out.println("inside Modify");return fetch.executeFetch(commandText);
+			case "FETCH": System.out.println("inside Fetch");return fetch.executeFetch(commandText);
+			default: System.out.println("inside Default");break;
+			}
+		resp = new ResponseDTO();
+		resp.setMesg("Invalid Command");
+		return resp;
 		}
 		catch(Exception E)
 		{
@@ -72,6 +74,5 @@ public class MainService {
 		f.separator(command6).getMesg();
 		String text = "FETCH /info-routes?from=A2&to=A4";
 		System.out.println(f.separator(text));
-//		System.out.println(FetchService.checkFetchCommand(text));
 	}
 }
