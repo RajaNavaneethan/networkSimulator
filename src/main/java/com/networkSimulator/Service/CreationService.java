@@ -37,7 +37,6 @@ public class CreationService {
 		{
 			if(netstore.getIndexMapper().containsKey(respMesg.get("name")))
 			{
-				System.out.println("Index Mappepr value"+netstore.getIndexMapper().size());
 				resp.setMesg("Device "+respMesg.get("name")+" already exists");
 			}
 			else
@@ -103,7 +102,6 @@ public class CreationService {
 		{
 			e.printStackTrace();
 			resp.setMesg("Invalid Command");
-			System.out.println("Invalid cgheck 2");
 			return resp;
 		}
 	}
@@ -156,39 +154,4 @@ public class CreationService {
 			return TYPE.neither;
 		return isCreate ? TYPE.create : TYPE.connect;
 	}
-	
-	public static void main(String[] args)
-	{
-		String command = "CREATE /devices\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A1\"}";
-		String command1 = "CREATE /devices\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A2\"}";
-		String command3 = "CREATE /devices\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A3\"}";
-		String command2 = "CREATE /connections\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"source\" : \"A1\", \"targets\" : [\"A2\",\"A3\"]}";
-		String command5 = "CREATE /connections\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"source\" : \"A3\", \"targets\" : [\"A4\"]}";
-		String command4 = "CREATE /devices\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A4\"}";
-		String command6 = "CREATE /devices\r\n"
-				+ "content-type : application/json\r\n"
-				+ "{\"type\" : \"COMPUTER\", \"name\" : \"A5\"}";
-		CreationService s = new CreationService();
-		s.executeCreate(command).getMesg();
-		s.executeCreate(command1).getMesg();
-		s.executeCreate(command3).getMesg();
-		s.executeCreate(command2).getMesg();
-		s.executeCreate(command4).getMesg();
-		s.executeCreate(command5).getMesg();
-		s.executeCreate(command6).getMesg();
-		netstore.calculateRoute("A2","A4");
-	}
-	
 }

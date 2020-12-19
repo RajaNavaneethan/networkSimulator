@@ -99,6 +99,7 @@ public class NetworkStore {
 			System.out.println(a);
 		return "null";
 	}
+	
 	public  void add()
 	{
 		NetworkStore netstore = NetworkStore.getInstance();
@@ -114,17 +115,7 @@ public class NetworkStore {
 		{
 			v.get(i).add(0);
 		}
-//		System.out.println(v.size());
 		netstore.setVec(v);
-		for(int i=0;i<v.size();i++)
-		{
-			Vector<Integer> temp = v.get(i);
-			for(int j=0;j<temp.size();j++)
-			{
-				System.out.print(temp.get(j)+"\t");
-			}
-			System.out.println("\n");
-		}
 	}
 	
 }

@@ -18,7 +18,6 @@ public class ModifyService {
 		JSONObject respMesg  = new JSONObject(json);
 		if(!checkModifyCommand(commandText))
 		{
-			System.out.println("Invalid");
 			resp.setMesg("Invalid Command");
 		}
 		else

@@ -19,7 +19,6 @@ public class MainController {
 	@Autowired
 	public MainService mainService;
 
-//	public String getValues(@RequestParam("type") String type,@RequestParam("value") String value)
 	@PostMapping(value  = "/ajiranet/process",produces=MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.TEXT_PLAIN_VALUE)
 	@ResponseBody
 	public ResponseEntity<ResponseDTO > getValues(@RequestBody String bodymsg)
