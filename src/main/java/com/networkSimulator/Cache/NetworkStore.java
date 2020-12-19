@@ -22,7 +22,6 @@ public class NetworkStore {
 	public void setIndexMapper(Map<String, Integer> indexMapper) {
 		this.indexMapper = indexMapper;
 	}
-	
 	public Vector<Vector<Integer>> getVec() {
 		return vec;
 	}
@@ -37,6 +36,18 @@ public class NetworkStore {
 	}
 	private NetworkStore() {
 		System.out.println("Insidie the constructor");
+	}
+	public Map<Integer, Integer> getStrength() {
+		return Strength;
+	}
+	public void setStrength(Map<Integer, Integer> strength) {
+		Strength = strength;
+	}
+	public static NetworkStore getInstance() {
+		if(instance == null) { 
+			instance = new NetworkStore();
+		}
+		return instance;
 	}
 	
 	public ArrayList<Integer> DFSUtil(int source, int destn, HashSet<Integer> visited,ArrayList<Integer> temp,int token)
@@ -70,12 +81,10 @@ public class NetworkStore {
 			return result;
 	}
 	
-//	public void DFS(int source,int destn,HashSet<Integer> visited,ArrayList<Integer> temp)
-//	{
-//		
-//	}
 	public String calculateRoute(String source,String destination)
 	{
+		if(!indexMapper.containsKey(source) || !indexMapper.containsKey(destination))
+			return "Nodes do not exist";
 		if(!deviceTypeMapper.get(indexMapper.get(source)).equalsIgnoreCase("COMPUTER") || !deviceTypeMapper.get(indexMapper.get(destination)).equalsIgnoreCase("COMPUTER"))
 			return "Route cannot be calculated with repeater";
 		int sourceIndex = indexMapper.get(source);
@@ -117,18 +126,5 @@ public class NetworkStore {
 			System.out.println("\n");
 		}
 	}
-	public Map<Integer, Integer> getStrength() {
-		return Strength;
-	}
-	public void setStrength(Map<Integer, Integer> strength) {
-		Strength = strength;
-	}
-	public static NetworkStore getInstance() {
-		if(instance == null) { 
-			instance = new NetworkStore();
-		}
-		return instance;
-	}
-	
 	
 }

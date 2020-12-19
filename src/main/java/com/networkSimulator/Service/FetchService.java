@@ -1,85 +1,98 @@
 package com.networkSimulator.Service;
 
-import java.util.Iterator;
-import java.util.Map;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+
 import com.networkSimulator.Cache.NetworkStore;
 import com.networkSimulator.DTO.ResponseDTO;
 
 @Service
 public class FetchService {
 	NetworkStore netstore = NetworkStore.getInstance();
-	
+	enum TYPE{
+		devices,
+		info,
+		neither
+	}
 	public  ResponseDTO executeFetch(String commandText)
 	{
 		ResponseDTO resp = new ResponseDTO();
 		try {
-		String json = commandText.substring(commandText.indexOf("{"));
-		JSONObject respMesg  = new JSONObject(json);
-		if(!checkCreateCommand(commandText))
+		TYPE check = checkFetchCommand(commandText);
+		if(check==TYPE.neither)
 		{
 			System.out.println("Invalid");
 			resp.setMesg("Invalid Command");
 		}
-		else if(netstore.getIndexMapper().containsKey(respMesg.get("name")))
+		else if(check==TYPE.devices)
 		{
-			System.out.println("Index Mappepr value"+netstore.getIndexMapper().size());
-			resp.setMesg("Device "+respMesg.get("name")+" already exists");
+			
 		}
 		else
 		{
-			int index = netstore.getIndexMapper().size();
-			Map<String,Integer> temp = netstore.getIndexMapper();
-			temp.put(respMesg.getString("name"), index);
-			netstore.setIndexMapper(temp);
-			netstore.add();
-			resp.setMesg("Succesfully added "+respMesg.get("name"));
+			String com = commandText.split("/")[1];
+			String[] routes = com.split("\\?");
+			String[] srcDest = routes[1].split("&");
+			String[] from = srcDest[0].split("=");
+			String[] to = srcDest[1].split("=");
+			netstore.calculateRoute(from[1],to[1]);
 		}
 		return resp;
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			resp.setMesg("Invalid Command");
 			return resp;
 		}
 	}
-	public boolean checkCreateCommand(String text) {
+	public TYPE checkFetchCommand(String text) {
 		//splitting
+		
 		String[] commandSplit = text.split("\\s+");
+		try {
+		if(commandSplit.length > 2)
+			return TYPE.neither;
+			
 		for(int i=0;i<commandSplit.length;i++)
 		{
 			switch(i)
 			{
-			case 0:if(!commandSplit[i].equalsIgnoreCase("CREATE")) return false; break;
-			case 1:if(commandSplit[i].charAt(0)!='/')return false; break;
-			case 2: if(!commandSplit[i].equalsIgnoreCase("content-type")) return false; break;
-			case 3: if(!commandSplit[i].equals(":")) return false; break;
-			case 4: if(!commandSplit[i].equalsIgnoreCase("application/json")) return false; break;
-			case 5:if(commandSplit[i].charAt(0)!='{')return false; break;
+			case 0:if(!commandSplit[i].equalsIgnoreCase("FETCH")) return TYPE.neither; break;
+			case 1:if(commandSplit[i].charAt(0)!='/')return TYPE.neither; break;
 			}
 		}
-		try {
-		JSONObject check  = new JSONObject(text.substring(text.indexOf("{")));
-		Iterator<String> keys = check.keys();
-		int keyslen = 0 ;
-		while(keys.hasNext())
+		String[] com = commandSplit[1].split("/");
+		if(com.length == 2 && com[0].equals("devices"))
+			return TYPE.devices;
+		else if(com.length==2)
 		{
-			keyslen++;
-			String key = keys.next();
-			if(!(key.equalsIgnoreCase("type") || key.equalsIgnoreCase("name")))
+			//info-routes?
+			String info = com[1];
+			String[] routes = info.split("\\?");
+			if(routes.length!=2 || !routes[0].equals("info-routes"))
+				return TYPE.neither;
+			else  
 			{
-				return false;
+				String[] srcDest = routes[1].split("&");
+				if(srcDest.length != 2)
+					return TYPE.neither;
+				String[] from = srcDest[0].split("=");
+				String[] to = srcDest[1].split("=");
+				if(from.length != 2 || to.length!=2)
+					return TYPE.neither;
+				if(!from[0].equals("from") || !to[0].equals("to"))
+					return TYPE.neither;
+				return TYPE.info;
 			}
 		}
-		if(keyslen>2)
-			return false;
-		return true;
+		else
+			return TYPE.neither;
 		}
 		catch(Exception E)
 		{
 			E.printStackTrace();
-			return false;
+			return TYPE.neither;
 		}
 	}
+	
 }
