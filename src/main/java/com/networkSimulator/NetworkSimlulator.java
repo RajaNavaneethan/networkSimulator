@@ -1,13 +1,14 @@
-package com.network.simulator.main;
+package com.networkSimulator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class NetworkSimlulator {
 
+	
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(NetworkSimlulator.class, args);
 	}
 
 }

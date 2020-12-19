@@ -18,6 +18,13 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/net.sf.json-lib/json-lib
+	//compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.4'
+	// https://mvnrepository.com/artifact/org.json/json
+	compile group: 'org.json', name: 'json', version: '20201115'
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	//compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.0'
+	
 }
 
 test {
