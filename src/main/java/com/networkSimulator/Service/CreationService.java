@@ -31,12 +31,14 @@ public class CreationService {
 		TYPE check = checkCreateCommand(commandText);
 		if(check==TYPE.neither)
 		{
+			resp.setHttpResponse(400);
 			resp.setMesg("Invalid Command");
 		}
 		else if(check==TYPE.create) 
 		{
 			if(netstore.getIndexMapper().containsKey(respMesg.get("name")))
 			{
+				resp.setHttpResponse(400);
 				resp.setMesg("Device "+respMesg.get("name")+" already exists");
 			}
 			else
@@ -51,6 +53,7 @@ public class CreationService {
 				netstore.setIndexMapper(temp);
 				netstore.setDeviceTypeMapper(temp1);
 				netstore.add();
+				resp.setHttpResponse(200);
 				resp.setMesg("Succesfully added "+respMesg.get("name"));
 			}
 		}
@@ -60,6 +63,7 @@ public class CreationService {
 			String source = respMesg.getString("source");
 			if(!netstore.getIndexMapper().containsKey(source))
 			{
+				resp.setHttpResponse(400);
 				resp.setMesg("Node '"+source+"' not found");
 				return resp;
 			}
@@ -70,11 +74,13 @@ public class CreationService {
 			{
 				if(!netstore.getIndexMapper().containsKey(jar.get(i)))
 				{	
+					resp.setHttpResponse(400);
 					resp.setMesg("Node '"+jar.get(i)+"' not found");
 					return resp;
 				}
 				if(source.equals(jar.get(i)))
 				{
+					resp.setHttpResponse(400);
 					resp.setMesg("Cannot connect device to itself");
 					return resp;
 				}
@@ -83,6 +89,7 @@ public class CreationService {
 				Vector<Integer> val1 = vec.get(targetIndex);
 				if(val.get(targetIndex) != 0)
 				{
+					resp.setHttpResponse(400);
 					resp.setMesg("Devices are already connected");
 					return resp;
 				}
@@ -91,6 +98,8 @@ public class CreationService {
 					val.set(targetIndex,5);
 					val1.set(sourceIndex,5);
 				}
+				resp.setHttpResponse(200);
+				resp.setMesg("Successfully Connected");
 				vec.set(sourceIndex, val);
 				vec.set(targetIndex, val1);
 				netstore.setVec(vec);
@@ -101,6 +110,7 @@ public class CreationService {
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			resp.setHttpResponse(400);
 			resp.setMesg("Invalid Command");
 			return resp;
 		}
@@ -137,7 +147,7 @@ public class CreationService {
 	public TYPE checkType(JSONObject input )
 	{
 		boolean isCreate = false;
-		if(input.has("type")  && input.has("name"))
+		if(input.has("type")  && input.has("name") && (input.getString("type").equalsIgnoreCase("Computer") || input.getString("type").equalsIgnoreCase("Repeater")))
 			isCreate = true;
 		else if(input.has("source")  && input.has("targets"))
 			isCreate = false;
@@ -153,5 +163,15 @@ public class CreationService {
 		if(keyslen>2)
 			return TYPE.neither;
 		return isCreate ? TYPE.create : TYPE.connect;
+	}
+	
+	public static void main(String[] args)
+	{
+		CreationService c= new CreationService();
+		String s = "CREATE /connections\r\n"
+				+ "content-type : application/json\r\n"
+				+ "{\"source\" : \"A1\", \"targets\" : [\"A2\", \"A3\"]}";
+		System.out.println(c.executeCreate(s).getMesg());
+		
 	}
 }

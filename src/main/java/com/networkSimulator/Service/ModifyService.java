@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import com.networkSimulator.Cache.NetworkStore;
 import com.networkSimulator.DTO.ResponseDTO;
+import com.networkSimulator.util.IntegerUtil;
 
 @Service
 public class ModifyService {
@@ -18,29 +19,41 @@ public class ModifyService {
 		JSONObject respMesg  = new JSONObject(json);
 		if(!checkModifyCommand(commandText))
 		{
-			resp.setMesg("Invalid Command");
+			resp.setMesg("Invalid Command 1");
 		}
 		else
 		{
 			String[] commandSplit = commandText.split("\\s+");
 			String[] deviceName = commandSplit[1].split("/");
-			if(deviceName.length!=3 || !deviceName[0].equals("devices") || !deviceName[2].equals("strength"))
+			if(deviceName.length!=4 || !deviceName[1].equals("devices") || !deviceName[3].equals("strength"))
 			{
-				resp.setMesg("Invalid Command");
+				resp.setMesg("Invalid Command 2");
 				return resp;
 			}
 			int index = netstore.getIndexMapper().size();
-			Map<String,Integer> temp = netstore.getIndexMapper();
-			temp.put(respMesg.getString("name"), index);
-			netstore.setIndexMapper(temp);
-			netstore.add();
-			resp.setMesg("Succesfully added "+respMesg.get("name"));
+			String device = deviceName[2];
+			JSONObject check  = new JSONObject(commandText.substring(commandText.indexOf("{")));
+			if(!IntegerUtil.isInteger(check.get("value").toString()))
+				resp.setMesg("value should be an integer");
+			else
+			{
+				if(!netstore.getIndexMapper().containsKey(device))
+					resp.setMesg("Device Not found");
+				else
+				{
+					Map<Integer,Integer> temp  = netstore.getStrength();
+					temp.put(netstore.getIndexMapper().get(device), Integer.parseUnsignedInt(check.get("value").toString()));
+					netstore.setStrength(temp);
+					resp.setMesg("Successfully defined strength");
+				}
+			}
 		}
 		return resp;
 		}
 		catch(Exception e)
 		{
-			resp.setMesg("Invalid Command");
+			e.printStackTrace();
+			resp.setMesg("Invalid Command exc");
 			return resp;
 		}
 	}
@@ -79,5 +92,14 @@ public class ModifyService {
 			E.printStackTrace();
 			return false;
 		}
+	}
+	public static void main(String[] args)
+	{
+		ModifyService c= new ModifyService();
+		String s = "MODIFY /devices/A1/strength\r\n"
+				+ "content-type : application/json\r\n"
+				+ "{\"value\": somevalues}";
+		System.out.println(c.executeModify(s).getMesg());
+		
 	}
 }

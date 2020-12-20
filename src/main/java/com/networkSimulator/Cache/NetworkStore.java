@@ -35,7 +35,6 @@ public class NetworkStore {
 		this.vec = vec;
 	}
 	private NetworkStore() {
-		System.out.println("Insidie the constructor");
 	}
 	public Map<Integer, Integer> getStrength() {
 		return Strength;
@@ -52,10 +51,11 @@ public class NetworkStore {
 	
 	public ArrayList<Integer> DFSUtil(int source, int destn, HashSet<Integer> visited,ArrayList<Integer> temp,int token)
 	{
-		if(token ==0)
-			return null;
+
 		if(source == destn)
 			return temp;
+		if(token ==0)
+			return null;
 		Vector<Integer> val = vec.get(source);
 		int count = Integer.MAX_VALUE;
 		ArrayList<Integer> result = null;
@@ -65,13 +65,20 @@ public class NetworkStore {
 			{
 				visited.add(i);
 				int index = temp.size();
-				temp.add(i);
-				int newToken = deviceTypeMapper.get(i).equalsIgnoreCase("Computer") ? token-1: (token-1)*2;
-				ArrayList<Integer> t = DFSUtil(i,destn,visited,temp,newToken);
+				//sending duplicate 
+				ArrayList<Integer> temp1 = new ArrayList<Integer>(temp);
+				temp1.add(i);
+				/* as per example for the route from A1 to A5 the strength of the signal 
+				 * is reduced at the destination server */
+				int newToken = deviceTypeMapper.get(i).equalsIgnoreCase("Computer") ? token-1: (token)*2;
+				ArrayList<Integer> t = DFSUtil(i,destn,visited,temp1,newToken);
 				if(t!=null && t.size()<count)
+				{
 					result = t;
+					count = t.size();
+				}
 				else
-					temp.remove(index);
+					temp1.remove(index);
 				visited.remove(i);
 			}
 		}
@@ -89,17 +96,39 @@ public class NetworkStore {
 			return "Route cannot be calculated with repeater";
 		int sourceIndex = indexMapper.get(source);
 		int destnIndex = indexMapper.get(destination);
+		if(sourceIndex == destnIndex)
+			return "Route is"+sourceIndex+"->"+destnIndex;
 		HashSet<Integer> s = new HashSet<>();
 		s.add(sourceIndex);
 		System.out.println("Printing the routes "+Strength.get(sourceIndex));
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 		temp.add(sourceIndex);
 		ArrayList<Integer> arr =  DFSUtil(sourceIndex,destnIndex,s,temp,Strength.get(sourceIndex));
-		for(Integer a : arr)
-			System.out.println(a);
-		return "null";
+		if(arr==null)
+			return "No Routes Found";
+		StringBuffer res = new StringBuffer("Route is ");
+		for(int i=0;i<arr.size();i++)
+		{
+			if(i==arr.size()-1)
+				res.append(findName(arr.get(i)));
+			else
+			{
+				res.append(findName(arr.get(i)));
+				res.append("->");
+			}
+		}
+		return res.toString();
 	}
 	
+	public String findName(int index)
+	{
+		 for (Map.Entry<String,Integer> entry : indexMapper.entrySet())  
+		 {
+			 if(entry.getValue()==index)
+				 return entry.getKey();
+		 }
+		 return "";
+	}
 	public  void add()
 	{
 		NetworkStore netstore = NetworkStore.getInstance();
@@ -117,5 +146,6 @@ public class NetworkStore {
 		}
 		netstore.setVec(v);
 	}
+	
 	
 }

@@ -1,5 +1,9 @@
 package com.networkSimulator.Service;
 
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.networkSimulator.Cache.NetworkStore;
@@ -20,11 +24,23 @@ public class FetchService {
 		TYPE check = checkFetchCommand(commandText);
 		if(check==TYPE.neither)
 		{
+			resp.setHttpResponse(400);
 			resp.setMesg("Invalid Command");
 		}
 		else if(check==TYPE.devices)
 		{
-			
+			JSONArray jarr = new JSONArray();
+			Map<String,Integer> devices = netstore.getIndexMapper();
+			Map<Integer,String> types = netstore.getDeviceTypeMapper();
+			 for (Map.Entry<String,Integer> entry : devices.entrySet())  
+			 {
+				JSONObject json = new JSONObject();
+				 json.put("name", entry.getKey());
+				 json.put("type", types.get(entry.getValue()));
+				 jarr.put(json);
+			 }
+			 resp.setHttpResponse(200);
+			 resp.setMesg(jarr.toString());
 		}
 		else
 		{
@@ -33,13 +49,15 @@ public class FetchService {
 			String[] srcDest = routes[1].split("&");
 			String[] from = srcDest[0].split("=");
 			String[] to = srcDest[1].split("=");
-			netstore.calculateRoute(from[1],to[1]);
+			resp.setHttpResponse(200);
+			resp.setMesg(netstore.calculateRoute(from[1],to[1]));
 		}
 		return resp;
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			resp.setHttpResponse(400);
 			resp.setMesg("Invalid Command");
 			return resp;
 		}
@@ -61,7 +79,7 @@ public class FetchService {
 			}
 		}
 		String[] com = commandSplit[1].split("/");
-		if(com.length == 2 && com[0].equals("devices"))
+		if(com.length == 2 && com[1].equals("devices"))
 			return TYPE.devices;
 		else if(com.length==2)
 		{
