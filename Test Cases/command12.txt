@@ -1,0 +1,3 @@
+CREATE /connections
+content-type : application/json
+{"source" : "A1", "targets" : ["A2", "A3"]}

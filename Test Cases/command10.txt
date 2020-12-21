@@ -1,0 +1,3 @@
+MODIFY /devices/A1/strength
+content-type : application/json
+{"value": "Helloworld"}

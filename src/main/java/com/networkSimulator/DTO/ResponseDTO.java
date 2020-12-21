@@ -1,7 +1,5 @@
 package com.networkSimulator.DTO;
 
-import org.json.JSONObject;
-
 public class ResponseDTO {
 	private String mesg ;
 	private int httpResponse;

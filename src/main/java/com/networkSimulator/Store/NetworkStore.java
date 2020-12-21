@@ -1,4 +1,4 @@
-package com.networkSimulator.Cache;
+package com.networkSimulator.Store;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +88,7 @@ public class NetworkStore {
 			return result;
 	}
 	
+	//calculate route from one node to another with the help of DFS
 	public String calculateRoute(String source,String destination)
 	{
 		if(!indexMapper.containsKey(source) || !indexMapper.containsKey(destination))
@@ -96,11 +97,14 @@ public class NetworkStore {
 			return "Route cannot be calculated with repeater";
 		int sourceIndex = indexMapper.get(source);
 		int destnIndex = indexMapper.get(destination);
+		
 		if(sourceIndex == destnIndex)
 			return "Route is"+sourceIndex+"->"+destnIndex;
+		
+		System.out.println("Printing the routes "+Strength.get(sourceIndex));
 		HashSet<Integer> s = new HashSet<>();
 		s.add(sourceIndex);
-		System.out.println("Printing the routes "+Strength.get(sourceIndex));
+		
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 		temp.add(sourceIndex);
 		ArrayList<Integer> arr =  DFSUtil(sourceIndex,destnIndex,s,temp,Strength.get(sourceIndex));
@@ -120,6 +124,7 @@ public class NetworkStore {
 		return res.toString();
 	}
 	
+	// get name of each index 
 	public String findName(int index)
 	{
 		 for (Map.Entry<String,Integer> entry : indexMapper.entrySet())  
@@ -129,6 +134,8 @@ public class NetworkStore {
 		 }
 		 return "";
 	}
+	
+	//adding a node to the store
 	public  void add()
 	{
 		NetworkStore netstore = NetworkStore.getInstance();
