@@ -6,8 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import com.networkSimulator.Cache.NetworkStore;
 import com.networkSimulator.DTO.ResponseDTO;
+import com.networkSimulator.Store.NetworkStore;
 
 @Service
 public class FetchService {
@@ -63,7 +63,7 @@ public class FetchService {
 		}
 	}
 	public TYPE checkFetchCommand(String text) {
-		//splitting
+		//splitting the command and checking 
 		
 		String[] commandSplit = text.split("\\s+");
 		try {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.networkSimulator.DTO.ResponseDTO;
 import com.networkSimulator.Service.MainService;
 
+// Main Controller to get the input from the user on the endpoint /ajiranet/process
 @RestController
 public class MainController {
 
@@ -23,17 +24,23 @@ public class MainController {
 	@ResponseBody
 	public ResponseEntity<ResponseDTO > getValues(@RequestBody String bodymsg)
 	{
+		ResponseDTO resp;
 		try {	
-			ResponseDTO resp = mainService.separator(bodymsg);			
+			resp = mainService.separator(bodymsg);
+			if(resp.getHttpResponse()==200)
+				return ResponseEntity.ok()
+						.header("Content-Type", "Application/JSON")
+						.body(resp);
 			return ResponseEntity.badRequest()
-			        .header("Content-Type", "Application/JSON")
-			        .body(resp);	
+						.header("Content-Type", "Application/JSON")
+						.body(resp);
 		}
 		catch(Exception E)
 		{
-			System.out.println("Printing an error");
+			resp = new ResponseDTO();
+			resp.setMesg("Invalid Command");
 			E.printStackTrace();
-			return ResponseEntity.badRequest().body(null);
+			return ResponseEntity.badRequest().body(resp);
 		}
 	}
 }
